@@ -1,0 +1,111 @@
+version: '3.8'
+
+services:
+  # -----------------------------------------------------------------
+  # VPN Service - Handles the OpenVPN connection
+  # -----------------------------------------------------------------
+  vpn:
+    image: qmcgaw/gluetun
+    container_name: vpn
+    cap_add:
+      - NET_ADMIN
+    devices:
+      - /dev/net/tun:/dev/net/tun
+    ports:
+      - "5000:5000" # Expose Server port through VPN container
+    volumes:
+      - ./vpn:/gluetun
+    environment:
+      - VPN_SERVICE_PROVIDER=custom
+      - VPN_TYPE=openvpn
+      # The file name inside ./vpn directory must be 'custom.conf' or 'client.ovpn' depending on config
+      # For gluetun, simpliest is to name your file 'gluetun.conf' or just mount it map to /gluetun/client.conf
+      # We will instruct user to place 'client.ovpn' in ./vpn folder
+      - OPENVPN_CUSTOM_CONFIG=/gluetun/client.ovpn
+    networks:
+      - robomo_net
+    restart: always
+
+  # -----------------------------------------------------------------
+  # MongoDB
+  # -----------------------------------------------------------------
+  mongo:
+    image: mongo:latest
+    container_name: mongo
+    volumes:
+      - mongo_data:/data/db
+    networks:
+      - robomo_net
+    restart: always
+
+  # -----------------------------------------------------------------
+  # ML Service (Python)
+  # -----------------------------------------------------------------
+  ml:
+    build:
+      context: ./ml
+      dockerfile: Dockerfile
+    container_name: ml_service
+    # Exposing port internally to other containers
+    expose:
+      - "8000"
+    networks:
+      - robomo_net
+    restart: always
+
+  # -----------------------------------------------------------------
+  # Backend Server (Node.js)
+  # -----------------------------------------------------------------
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: server
+    # Important: Share network with VPN container
+    network_mode: service:vpn
+    environment:
+      - PORT=5000
+      # MongoDB Atlas is used by default (see server/Database/connect.js)
+      # Direct API access because we're on the VPN network
+      - DIRECT_API_ACCESS=true
+      - ML_SERVICE_URL=http://ml:8000
+    depends_on:
+      - mongo
+      - ml
+      - vpn
+    restart: always
+
+  # -----------------------------------------------------------------
+  # Client (React + Nginx)
+  # -----------------------------------------------------------------
+  client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile.prod
+    container_name: client
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - server
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    networks:
+      - robomo_net
+    restart: always
+
+  certbot:
+    image: certbot/certbot
+    container_name: certbot
+    volumes:
+      - ./certbot/conf:/etc/letsencrypt
+      - ./certbot/www:/var/www/certbot
+    entrypoint: "/bin/sh -c 'trap exit TERM; while :; do certbot renew; sleep 12h & wait $${!}; done;'"
+
+networks:
+  robomo_net:
+    driver: bridge
+
+volumes:
+  mongo_data:

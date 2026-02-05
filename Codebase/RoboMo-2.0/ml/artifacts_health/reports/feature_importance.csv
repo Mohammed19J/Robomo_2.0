@@ -1,0 +1,15 @@
+,importance
+co2 (ppm),745
+voc (ppb),680
+health_index_lag_10m,610
+rh (%),587
+health_index_lag_5m,512
+temp_c (°C),426
+pm10 (µg/m³),422
+pm4 (µg/m³),364
+pm1 (µg/m³),326
+hour,321
+pm25 (µg/m³),317
+health_index,276
+dow,142
+is_weekend,5

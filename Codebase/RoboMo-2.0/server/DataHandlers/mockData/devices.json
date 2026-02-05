@@ -1,0 +1,40 @@
+[
+  {
+    "id": "urn:ngsi-ld:Device:Device001",
+    "type": "SensorDevice",
+    "useCases": { "type": "Property", "value": "Demo" },
+    "temperature": { "type": "Number", "value": 22.5, "unit": "C" },
+    "humidity": { "type": "Number", "value": 45 },
+    "co2": { "type": "Number", "value": 650, "unit": "ppm" },
+    "voc": { "type": "Number", "value": 180, "unit": "ppb" },
+    "pm25": { "type": "Number", "value": 12, "unit": "µg/m³" },
+    "pm10": { "type": "Number", "value": 18, "unit": "µg/m³" },
+    "battery": { "type": "Number", "value": 87 },
+    "status": { "type": "Text", "value": "OK" },
+    "image": { "type": "Text", "value": "sensor-placeholder.png" }
+  },
+  {
+    "id": "urn:ngsi-ld:Device:Device002",
+    "type": "SensorDevice",
+    "useCases": { "type": "Property", "value": "Demo" },
+    "temperature": { "type": "Number", "value": 24.8, "unit": "C" },
+    "humidity": { "type": "Number", "value": 58 },
+    "co2": { "type": "Number", "value": 850, "unit": "ppm" },
+    "voc": { "type": "Number", "value": 320, "unit": "ppb" },
+    "pm25": { "type": "Number", "value": 28, "unit": "µg/m³" },
+    "pm10": { "type": "Number", "value": 35, "unit": "µg/m³" },
+    "battery": { "type": "Number", "value": 62 },
+    "status": { "type": "Text", "value": "Warning" },
+    "image": { "type": "Text", "value": "sensor-placeholder.png" }
+  },
+  {
+    "id": "urn:ngsi-ld:Device:Device003",
+    "type": "ActuatorDevice",
+    "useCases": { "type": "Property", "value": "Demo" },
+    "pressure": { "type": "Number", "value": 12.3 },
+    "flowRate": { "type": "Number", "value": 5.7 },
+    "battery": { "type": "Number", "value": 62 },
+    "status": { "type": "Text", "value": "Maintenance" },
+    "image": { "type": "Text", "value": "actuator-placeholder.png" }
+  }
+]

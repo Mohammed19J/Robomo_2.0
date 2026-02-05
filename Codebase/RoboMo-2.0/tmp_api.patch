@@ -1,0 +1,56 @@
+*** Begin Patch
+*** Update File: standards_baseline/api.py
+@@
+-from pathlib import Path
+-from typing import Optional
+-
+-from fastapi import APIRouter, HTTPException, Query
+-from fastapi.responses import HTMLResponse
+-
+-from .engine import BaselineOptions, compute_baseline
+-from .schemas import BaselineRequest, BaselineResponse, ModeRequest
+-from .switch import (
+-    compute_from_payload,
+-    get_last,
+-    get_mode,
+-    list_cached_devices,
+-    record_manual_request,
+-    set_mode,
+-)
++from pathlib import Path
++
++from fastapi import APIRouter, HTTPException, Query
++from fastapi.responses import HTMLResponse
++
++from .schemas import BaselineRequest, BaselineResponse, ModeRequest
++from .switch import (
++    compute_from_payload,
++    compute_request_payload,
++    get_last,
++    get_mode,
++    list_cached_devices,
++    set_mode,
++)
+@@
+-    device_id = request.device_id or (
+-        request.readings[-1].device_id if request.readings else None
+-    )
+-    if not device_id:
++    if not request.readings and not request.device_id:
+         raise HTTPException(status_code=400, detail="device_id required")
+-
+-    options = BaselineOptions(
+-        volume_m3=request.volume_m3 or BaselineOptions().volume_m3,
+-        ach=request.ach,
+-        cout_ppm=request.cout_ppm or BaselineOptions().cout_ppm,
+-        g_person=request.g_per_person_m3_s or BaselineOptions().g_person,
+-    )
+-    raw = [r.model_dump(by_alias=True, exclude_none=True) for r in request.readings]
+-    result = compute_baseline(device_id, raw, options)
+-    record_manual_request(request, result)
+-    return result
++    result = compute_request_payload(
++        request.model_dump(by_alias=True, exclude_none=True)
++    )
++    return result
+*** End Patch

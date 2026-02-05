@@ -1,0 +1,68 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Baseline IAQ Dashboard</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 1.5rem; background: #f5f7fb; }
+    h1 { font-size: 1.4rem; }
+    .card { background: #fff; border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            padding: 1rem 1.2rem; margin-bottom: 1rem; max-width: 420px; }
+    .label { color: #555; font-size: 0.85rem; text-transform: uppercase; }
+    .value { font-size: 1.2rem; font-weight: 600; margin: 0.2rem 0 0.6rem; }
+    .status { font-weight: bold; }
+    .status.good { color: #2e7d32; }
+    .status.warn { color: #ef6c00; }
+    .status.bad { color: #c62828; }
+  </style>
+</head>
+<body>
+  <h1>Baseline IAQ Snapshot</h1>
+  <div class="card" id="info">Waiting for data...</div>
+
+  <script>
+    async function fetchStatus() {
+      const params = new URLSearchParams(window.location.search);
+      const deviceId = params.get('device_id');
+      if (!deviceId) {
+        document.getElementById('info').innerText = 'Add ?device_id=YOUR_DEVICE to the URL.';
+        return;
+      }
+      try {
+        const res = await fetch(`/baseline/last?device_id=${encodeURIComponent(deviceId)}`);
+        if (!res.ok) {
+          document.getElementById('info').innerText = 'No cached result yet.';
+          return;
+        }
+        const data = await res.json();
+        const iaq = data.iaq || {};
+        const smoke = data.smoke || {};
+        const occ = data.occupancy || {};
+
+        const score = iaq.iaq_score?.toFixed(1) ?? '---';
+        const aqi = iaq.aqi_pm25 != null ? iaq.aqi_pm25.toFixed(1) : '---';
+        const smokeFlag = smoke.smoke_present ? '⚠️ Smoke' : '✅ Clear';
+        const smokeClass = smoke.smoke_present ? 'status bad' : 'status good';
+        const occEst = occ.n_estimate != null ? occ.n_estimate.toFixed(1) : '---';
+
+        document.getElementById('info').innerHTML = `
+          <div class="label">IAQ SCORE</div>
+          <div class="value">${score}</div>
+          <div class="label">PM2.5 AQI</div>
+          <div class="value">${aqi}</div>
+          <div class="label">Smoke</div>
+          <div class="status ${smokeClass}">${smokeFlag} (${smoke.reason || 'normal'})</div>
+          <div class="label">Occupancy Estimate</div>
+          <div class="value">${occEst}</div>
+        `;
+      } catch (err) {
+        console.error(err);
+        document.getElementById('info').innerText = 'Error fetching baseline data.';
+      }
+    }
+
+    fetchStatus();
+    setInterval(fetchStatus, 5000);
+  </script>
+</body>
+</html>
