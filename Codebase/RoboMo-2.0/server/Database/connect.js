@@ -1,7 +1,6 @@
 const mongoose = require("mongoose");
 
-const DEFAULT_URI =
-  "mongodb+srv://amal:amal123@cluster0.jtld3y8.mongodb.net/?appName=Cluster0";
+const DEFAULT_URI = "mongodb://localhost:27017";
 const DEFAULT_DB_NAME = "RoboMo2";
 
 let connectionPromise = null;

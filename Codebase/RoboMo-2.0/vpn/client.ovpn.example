@@ -1,0 +1,25 @@
+# Example OpenVPN client configuration (redacted)
+client
+nobind
+dev tun
+proto udp
+remote your.vpn.endpoint 1194
+resolv-retry infinite
+persist-key
+persist-tun
+remote-cert-tls server
+cipher AES-256-GCM
+auth SHA256
+verb 3
+
+<ca>
+# Paste CA certificate here
+</ca>
+
+<cert>
+# Paste client certificate here
+</cert>
+
+<key>
+# Paste client private key here
+</key>

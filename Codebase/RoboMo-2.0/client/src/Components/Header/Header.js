@@ -12,6 +12,8 @@ const Header = ({ toggleDarkMode }) => {
   const [passwordError, setPasswordError] = useState("");
 
   const darkMode = useContext(AppDarkMode)
+  const dataCollectionPassword =
+    process.env.REACT_APP_DATA_COLLECTION_PASSWORD || "change_me";
 
   useEffect(() => {
     socket.on("dataCollectionStatus", (status) => {
@@ -31,7 +33,7 @@ const Header = ({ toggleDarkMode }) => {
   };
 
   const handlePasswordSubmit = (password) => {
-    if (password === "tamkbraude") {
+    if (password === dataCollectionPassword) {
       // Success
       setDataCollectionEnabled(targetCollectionState);
       socket.emit("toggleDataCollection", targetCollectionState);
