@@ -2,6 +2,10 @@
 
 This repository contains the full capstone submission for RoboMo 2.0. It is organized into two submission parts (Phase A and Phase B) plus the complete project codebase. The codebase includes its own detailed README with setup and deployment instructions.
 
+## Live Website
+
+Hosted deployment: https://robomo2.duckdns.org/
+
 ## Repository Structure
 
 - `Phase A/`
